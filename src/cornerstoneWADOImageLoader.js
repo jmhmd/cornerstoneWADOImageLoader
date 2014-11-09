@@ -144,15 +144,11 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
                     total: total,
                     percentComplete: percentComplete
                 });
-/*<<<<<<< HEAD
             } else {
-                $(document).trigger('CornerstoneImageLoadProgress', {
-                    fileURL: oProgress.target.responseURL,
+                $(cornerstone).trigger('CornerstoneImageLoadProgress', {
+                    imageId: imageId,
                     loaded: oProgress.loaded
                 });
-            }
-        };
-=======*/
             }
         };
 
