@@ -1,4 +1,4 @@
-/*! cornerstoneWADOImageLoader - v0.4.5 - 2014-10-17 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstoneWADOImageLoader - v0.4.5 - 2014-11-08 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO requests.  It currently does not support compressed
 // transfer syntaxes or big endian transfer syntaxes.  It will support implicit little endian transfer
@@ -131,20 +131,31 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
         };
         oReq.onprogress = function(oProgress) {
             // console.log('progress:',oProgress)
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> 05b8a3241cc47b11a58ff4314cc358f468a5f7db
             if (oProgress.lengthComputable) {  //evt.loaded the bytes browser receive
                 //evt.total the total bytes seted by the header
                 //
                 var loaded = oProgress.loaded;
                 var total = oProgress.total;
                 var percentComplete = Math.round((loaded / total)*100);
+<<<<<<< HEAD
                 
                 $(document).trigger('CornerstoneImageLoadProgress', {
                     fileURL: oProgress.target.responseURL,
+=======
+
+                $(cornerstone).trigger('CornerstoneImageLoadProgress', {
+                    imageId: imageId,
+>>>>>>> 05b8a3241cc47b11a58ff4314cc358f468a5f7db
                     loaded: loaded,
                     total: total,
                     percentComplete: percentComplete
                 });
+<<<<<<< HEAD
             } else {
                 $(document).trigger('CornerstoneImageLoadProgress', {
                     fileURL: oProgress.target.responseURL,
@@ -152,6 +163,11 @@ var cornerstoneWADOImageLoader = (function ($, cornerstone, cornerstoneWADOImage
                 });
             }
         };
+=======
+            }
+        };
+
+>>>>>>> 05b8a3241cc47b11a58ff4314cc358f468a5f7db
         oReq.send();
 
         return deferred;
