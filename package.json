@@ -1,7 +1,7 @@
 {
     "name": "cornerstone-wado-image-loader",
-    "version": "0.5.0",
-    "description": "Cornerstone ImageLoader for DICOM WADO",
+    "version": "0.7.2",
+    "description": "Cornerstone ImageLoader for DICOM WADO-URI",
     "keywords": [
         "DICOM",
         "WADO",
@@ -27,6 +27,7 @@
         "grunt-contrib-clean": "^0.5.0",
         "grunt-contrib-jshint": "^0.8.0",
         "grunt-contrib-uglify": "^0.4.0",
+        "grunt-version": "^1.0.0",
         "load-grunt-tasks": "^0.2.1"
     }
 }

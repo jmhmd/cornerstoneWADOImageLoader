@@ -7,11 +7,17 @@ module.exports = function(grunt) {
             default: {
                 src: [
                     'dist',
-                    'docs',
                     'build'
                 ]
             }
         },
+        version: {
+          // options: {},
+          defaults: {
+            src: ['src/version.js', 'bower.json']
+          }
+        },
+
         copy : {
             bower: {
                 src: [
@@ -20,7 +26,12 @@ module.exports = function(grunt) {
                     'bower_components/cornerstone/dist/cornerstone.min.js',
                     'bower_components/dicomParser/dist/dicomParser.min.js',
                     'bower_components/jquery/dist/jquery.min.js',
-                    'bower_components/jquery/dist/jquery.min.map'
+                    'bower_components/jquery/dist/jquery.min.map',
+                    'bower_components/cornerstoneTools/dist/cornerstoneTools.js',
+                    'bower_components/cornerstoneMath/dist/cornerstoneMath.js',
+                    'bower_components/cornerstoneMath/dist/bootstrap.js',
+                  'bower_components/bootstrap/dist/js/bootstrap.min.js',
+                  'bower_components/bootstrap/dist/css/bootstrap.min.css'
                 ],
                 dest: 'examples',
                 expand: true,
@@ -29,7 +40,7 @@ module.exports = function(grunt) {
         },
         concat: {
             build: {
-                src : ['src/cornerstoneWADOImageLoader.js', 'src/*.js', 'ext/**/*.js'],
+                src : ['src/header.js', 'src/**/*.js'],
                 dest: 'build/built.js'
             },
             dist: {
@@ -65,7 +76,7 @@ module.exports = function(grunt) {
         },
         watch: {
             scripts: {
-                files: ['src/*.js', 'test/*.js'],
+                files: ['src/**/*.js', 'test/*.js'],
                 tasks: ['concat:build', 'concat:dist', 'jshint', 'qunit']
             }
         }
@@ -73,12 +84,14 @@ module.exports = function(grunt) {
 
     require('load-grunt-tasks')(grunt);
 
-    grunt.registerTask('buildAll', ['clean','concat:build', 'concat:dist', 'uglify', 'jshint']);
+    grunt.registerTask('buildAll', ['clean', 'concat:build', 'concat:dist', 'uglify', 'jshint']);
     grunt.registerTask('default', ['buildAll']);
 };
 
 // Release process:
 //  1) Update version numbers
+//     update version in package.json
+//     grunt version
 //  2) do a build (needed to update dist versions with correct build number)
 //  3) commit changes
 //      git commit -am "Changes...."

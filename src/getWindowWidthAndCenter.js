@@ -1,11 +1,6 @@
-var cornerstoneWADOImageLoader = (function (cornerstoneWADOImageLoader) {
+(function (cornerstoneWADOImageLoader) {
 
     "use strict";
-
-    if(cornerstoneWADOImageLoader === undefined) {
-        cornerstoneWADOImageLoader = {};
-    }
-
 
     function getWindowWidthAndCenter(dataSet)
     {
@@ -20,20 +15,14 @@ var cornerstoneWADOImageLoader = (function (cornerstoneWADOImageLoader) {
             windowWidth: undefined
         };
 
-        var windowCenter = dataSet.floatString('x00281050');
-        var windowWidth = dataSet.floatString('x00281051');
+        if(dataSet.elements.x00281050 && dataSet.elements.x00281051) {
+          result.windowCenter = dataSet.floatString('x00281050');
+          result.windowWidth = dataSet.floatString('x00281051');
+        }
 
-        if(windowCenter) {
-            result.windowCenter = windowCenter;
-        }
-        if(windowWidth ) {
-            result.windowWidth = windowWidth;
-        }
         return result;
     }
 
     // module exports
     cornerstoneWADOImageLoader.getWindowWidthAndCenter = getWindowWidthAndCenter;
-
-    return cornerstoneWADOImageLoader;
 }(cornerstoneWADOImageLoader));
