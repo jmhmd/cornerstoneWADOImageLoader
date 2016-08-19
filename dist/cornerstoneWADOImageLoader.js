@@ -1,4 +1,4 @@
-/*! cornerstone-wado-image-loader - v0.7.2 - 2015-09-18 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
+/*! cornerstone-wado-image-loader - v0.7.2 - 2015-11-03 | (c) 2014 Chris Hafey | https://github.com/chafey/cornerstoneWADOImageLoader */
 //
 // This is a cornerstone image loader for WADO-URI requests.  It has limited support for compressed
 // transfer syntaxes, check here to see what is currently supported:
@@ -3428,6 +3428,28 @@ var JpegImage = (function jpegImage() {
   };
 
 }(cornerstoneWADOImageLoader));
+var cornerstoneWADOImageLoader = (function (cornerstoneWADOImageLoader) {
+
+	"use strict";
+
+	if (cornerstoneWADOImageLoader === undefined) {
+		cornerstoneWADOImageLoader = {};
+	}
+
+	function getImageMetadata(dataSet) {
+		return {
+			frameOfReferenceUID: dataSet.string('x00200052'),
+			imageOrientationPatient: dataSet.string('x00200037'),
+			imagePositionPatient: dataSet.string('x00200032'),
+			pixelSpacing: dataSet.string('x00280030')
+		};
+	}
+
+	// module exports
+	cornerstoneWADOImageLoader.getImageMetadata = getImageMetadata;
+
+	return cornerstoneWADOImageLoader;
+}(cornerstoneWADOImageLoader));
 (function (cornerstoneWADOImageLoader) {
 
   "use strict";
@@ -3687,7 +3709,8 @@ var JpegImage = (function jpegImage() {
                 rowPixelSpacing: pixelSpacing.row,
                 data: dataSet,
                 invert: false,
-                sizeInBytes: sizeInBytes
+                sizeInBytes: sizeInBytes,
+                metaData: cornerstoneWADOImageLoader.getImageMetadata(dataSet)
             };
 
             if(image.windowCenter === undefined) {
@@ -3812,7 +3835,8 @@ var JpegImage = (function jpegImage() {
             rowPixelSpacing: pixelSpacing.row,
             data: dataSet,
             invert: invert,
-            sizeInBytes: sizeInBytes
+            sizeInBytes: sizeInBytes,
+            metaData: cornerstoneWADOImageLoader.getImageMetadata(dataSet)
         };
 
         // modality LUT
