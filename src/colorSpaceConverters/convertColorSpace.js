@@ -11,6 +11,15 @@
     }
   }
 
+  function convertYBRFull(dataSet, decodedImageFrame, rgbaBuffer) {
+    var planarConfiguration = dataSet.uint16('x00280006');
+    if(planarConfiguration === 0) {
+      cornerstoneWADOImageLoader.convertYBRFullByPixel(decodedImageFrame, rgbaBuffer);
+    } else {
+      cornerstoneWADOImageLoader.convertYBRFullByPlane(decodedImageFrame, rgbaBuffer);
+    }
+  }
+
   function convertColorSpace(canvas, dataSet, imageFrame) {
     // extract the fields we need
     var height = dataSet.uint16('x00280010');
@@ -22,7 +31,6 @@
     canvas.width = width;
     var context = canvas.getContext('2d');
     var imageData = context.createImageData(width, height);
-
 
     // convert based on the photometric interpretation
     var deferred = $.Deferred();
@@ -45,21 +53,21 @@
       }
       else if( photometricInterpretation === "YBR_FULL_422" )
       {
-        cornerstoneWADOImageLoader.convertYBRFull(imageFrame, imageData.data);
+        convertYBRFull(dataSet, imageFrame, imageData.data);
       }
       else if(photometricInterpretation === "YBR_FULL" )
       {
-        cornerstoneWADOImageLoader.convertYBRFull(imageFrame, imageData.data);
+        convertYBRFull(dataSet, imageFrame, imageData.data);
       }
       else
       {
         throw "no color space conversion for photometric interpretation " + photometricInterpretation;
       }
       deferred.resolve(imageData);
-      return deferred;
+      return deferred.promise();
     } catch (error) {
       deferred.reject(error);
-      return deferred;
+      return deferred.promise();
     }
   }
 

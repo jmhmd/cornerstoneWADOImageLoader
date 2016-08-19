@@ -2,7 +2,7 @@
 
   "use strict";
 
-  function xhrRequest(imageId, frame, url) {
+  function xhrRequest(url, imageId) {
 
     var deferred = $.Deferred();
 
@@ -10,7 +10,7 @@
     var xhr = new XMLHttpRequest();
     xhr.open("get", url, true);
     xhr.responseType = "arraybuffer";
-    cornerstoneWADOImageLoader.internal.options.beforeSend(xhr);
+      cornerstoneWADOImageLoader.internal.options.beforeSend(xhr);
     xhr.onreadystatechange = function (oEvent) {
       // TODO: consider sending out progress messages here as we receive the pixel data
       if (xhr.readyState === 4) {
@@ -22,22 +22,11 @@
           var byteArray = new Uint8Array(dicomPart10AsArrayBuffer);
           var dataSet = dicomParser.parseDicom(byteArray);
 
-          // if multiframe, cache the parsed data set to speed up subsequent
-          // requests for the other frames
-          if (frame !== undefined) {
-            cornerstoneWADOImageLoader.internal.multiFrameCacheHack[url] = dataSet;
-          }
-
-          var imagePromise = cornerstoneWADOImageLoader.createImageObject(dataSet, imageId, frame);
-          imagePromise.then(function (image) {
-            deferred.resolve(image);
-          }, function (error) {
-            deferred.reject(error);
-          });
+          deferred.resolve(dataSet);
         }
         else {
           // request failed, reject the deferred
-          deferred.reject(xhr.response);
+          deferred.reject(xhr);
         }
       }
     };
@@ -62,7 +51,7 @@
 
     xhr.send();
 
-    return deferred;
+    return deferred.promise();
   }
 
   cornerstoneWADOImageLoader.internal.xhrRequest = xhrRequest;

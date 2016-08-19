@@ -18,7 +18,7 @@
         return cornerstoneWADOImageLoader.convertColorSpace(canvas, dataSet, decodedImageFrame);
     }
 
-    function makeColorImage(imageId, dataSet, frame) {
+    function makeColorImage(imageId, dataSet, frame, sharedCacheKey) {
 
         // extract the DICOM attributes we need
         var pixelSpacing = cornerstoneWADOImageLoader.getPixelSpacing(dataSet);
@@ -27,7 +27,8 @@
         var rescaleSlopeAndIntercept = cornerstoneWADOImageLoader.getRescaleSlopeAndIntercept(dataSet);
         var bytesPerPixel = 4;
         var numPixels = rows * columns;
-        var sizeInBytes = numPixels * bytesPerPixel;
+        //var sizeInBytes = numPixels * bytesPerPixel;
+        var sizeInBytes = dataSet.byteArray.length;
         var windowWidthAndCenter = cornerstoneWADOImageLoader.getWindowWidthAndCenter(dataSet);
 
         // clear the lastImageIdDrawn so we update the canvas
@@ -42,7 +43,7 @@
         }
         catch(err) {
           deferred.reject(err);
-          return deferred;
+          return deferred.promise();
         }
 
         imageDataPromise.then(function(imageData) {
@@ -90,19 +91,28 @@
                 data: dataSet,
                 invert: false,
                 sizeInBytes: sizeInBytes,
-                metaData: cornerstoneWADOImageLoader.getImageMetadata(dataSet)
+                metaData: cornerstoneWADOImageLoader.getImageMetadata(dataSet),
+                sharedCacheKey: sharedCacheKey
             };
 
-            if(image.windowCenter === undefined) {
+          if(image.windowCenter === undefined || isNaN(image.windowCenter) ||
+            image.windowWidth === undefined || isNaN(image.windowWidth)) {
                 image.windowWidth = 255;
                 image.windowCenter = 128;
             }
+
+            // invoke the callback to allow external code to modify the newly created image object if needed - e.g.
+            // apply vendor specific workarounds and such
+            if(cornerstoneWADOImageLoader.internal.options.imageCreated) {
+                cornerstoneWADOImageLoader.internal.options.imageCreated(image);
+            }
+
             deferred.resolve(image);
         }, function(error) {
             deferred.reject(error);
         });
 
-        return deferred;
+        return deferred.promise();
     }
 
     // module exports

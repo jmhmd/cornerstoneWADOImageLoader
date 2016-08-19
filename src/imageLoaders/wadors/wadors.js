@@ -10,13 +10,13 @@
     var image = cornerstoneWADOImageLoader.imageManager.get(index);
     if(image === undefined) {
       deferred.reject('unknown imageId');
-      return deferred;
+      return deferred.promise();
     }
 
     var mediaType;// = 'image/dicom+jp2';
 
     cornerstoneWADOImageLoader.internal.getImageFrame(image.uri, mediaType).then(function(result) {
-      console.log(result);
+      //console.log(result);
       // TODO: add support for retrieving compressed pixel data
       var storedPixelData;
       if(image.instance.bitsAllocated === 16) {
@@ -45,7 +45,7 @@
       deferred.reject(reason);
     });
 
-    return deferred;
+    return deferred.promise();
   }
 
   // registery dicomweb and wadouri image loader prefixes
