@@ -1,8 +1,1 @@
-(function (cornerstoneWADOImageLoader) {
-
-  "use strict";
-
-  // module exports
-  cornerstoneWADOImageLoader.version = '0.13.3';
-
-}(cornerstoneWADOImageLoader));
+export default '3.0.7';
