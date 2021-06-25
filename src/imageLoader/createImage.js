@@ -66,6 +66,12 @@ function setPixelDataType(imageFrame) {
   }
 }
 
+function getArrayBuffer(buffer) {
+  const { buffer: b, byteOffset, byteLength } = buffer;
+
+  return b.slice(byteOffset, byteOffset + byteLength);
+}
+
 function createImage(imageId, pixelData, transferSyntax, options = {}) {
   if (!pixelData || !pixelData.length) {
     return Promise.reject(new Error('The file does not contain image data.'));
@@ -75,17 +81,26 @@ function createImage(imageId, pixelData, transferSyntax, options = {}) {
   const canvas = document.createElement('canvas');
   const imageFrame = getImageFrame(imageId);
 
-  const decodePromise = decodeImageFrame(
-    imageFrame,
-    transferSyntax,
-    pixelData,
-    canvas,
-    options
-  );
+  let decodePromise;
+
+  if (transferSyntax === 'htj2k') {
+    const pixelDataArrayBuffer = getArrayBuffer(pixelData);
+
+    imageFrame.pixelData = pixelDataArrayBuffer;
+    decodePromise = Promise.resolve(imageFrame);
+  } else {
+    decodePromise = decodeImageFrame(
+      imageFrame,
+      transferSyntax,
+      pixelData,
+      canvas,
+      options
+    );
+  }
 
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line complexity
-    decodePromise.then(function handleDecodeResponse(imageFrame) {
+    decodePromise.then(function(imageFrame) {
       // If we have a target buffer that was written to in the
       // Decode task, point the image to it here.
       // We can't have done it within the thread incase it was a SharedArrayBuffer.

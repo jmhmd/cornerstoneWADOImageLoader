@@ -4,6 +4,7 @@ const context = path.join(rootPath, 'src');
 const codecs = path.join(rootPath, 'codecs');
 const outputPath = path.join(rootPath, 'dist');
 const bannerPlugin = require('./plugins/banner');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -83,6 +84,17 @@ module.exports = {
       },
     ],
   },
-  plugins: [bannerPlugin()],
+  plugins: [
+    bannerPlugin(),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'codecs/openjphjs.wasm',
+          to: 'dist/openjphjs.wasm',
+          context: rootPath,
+        },
+      ],
+    }),
+  ],
   node: { fs: 'empty' },
 };

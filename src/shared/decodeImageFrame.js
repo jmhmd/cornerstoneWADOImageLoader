@@ -7,6 +7,7 @@ import decodeJPEGLS from './decoders/decodeJPEGLS.js';
 import decodeJPEG2000 from './decoders/decodeJPEG2000.js';
 import scaleArray from './scaling/scaleArray.js';
 
+// eslint-disable-next-line complexity
 function decodeImageFrame(
   imageFrame,
   transferSyntax,

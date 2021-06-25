@@ -7,6 +7,7 @@ import {
 } from './colorSpaceConverters/index.js';
 
 import { default as wadouri } from './wadouri/index.js';
+import { default as jphuri } from './jphuri/index.js';
 import { default as wadors } from './wadors/index.js';
 import { default as configure } from './configure.js';
 import { default as convertColorSpace } from './convertColorSpace.js';
@@ -30,6 +31,7 @@ const cornerstoneWADOImageLoader = {
   convertYBRFullByPlane,
   convertPALETTECOLOR,
   wadouri,
+  jphuri,
   wadors,
   configure,
   convertColorSpace,
@@ -54,6 +56,7 @@ export {
   convertYBRFullByPlane,
   convertPALETTECOLOR,
   wadouri,
+  jphuri,
   wadors,
   configure,
   convertColorSpace,
