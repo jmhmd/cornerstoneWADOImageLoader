@@ -1,14 +1,26 @@
 import decodeLittleEndian from './decoders/decodeLittleEndian.js';
 import decodeBigEndian from './decoders/decodeBigEndian.js';
 import decodeRLE from './decoders/decodeRLE.js';
-import decodeJPEGBaseline from './decoders/decodeJPEGBaseline.js';
-import decodeJPEGLossless from './decoders/decodeJPEGLossless.js';
-import decodeJPEGLS from './decoders/decodeJPEGLS.js';
-import decodeJPEG2000 from './decoders/decodeJPEG2000.js';
+// import decodeJPEGBaseline from './decoders/decodeJPEGBaseline.js';
+// import decodeJPEGLossless from './decoders/decodeJPEGLossless.js';
+// import decodeJPEGLS from './decoders/decodeJPEGLS.js';
+// import decodeJPEG2000 from './decoders/decodeJPEG2000.js';
+// import decodeHTJ2K from './decoders/decodeHTJ2K.js';
 import scaleArray from './scaling/scaleArray.js';
+import external from '../externalModules.js';
+
+const {
+  decodeJPEG2000,
+  decodeJPEGLossless,
+  decodeJPEGLS,
+  decodeJPEGBaseline,
+  decodeHTJ2K,
+} = external.decoders;
+
+require('regenerator-runtime');
 
 // eslint-disable-next-line complexity
-function decodeImageFrame(
+async function decodeImageFrame(
   imageFrame,
   transferSyntax,
   pixelData,
@@ -32,30 +44,55 @@ function decodeImageFrame(
   } else if (transferSyntax === '1.2.840.10008.1.2.5') {
     // RLE Lossless
     imageFrame = decodeRLE(imageFrame, pixelData);
-  } else if (transferSyntax === '1.2.840.10008.1.2.4.50') {
+  } else if (
+    transferSyntax === '1.2.840.10008.1.2.4.50' &&
+    decodeJPEGBaseline
+  ) {
     // JPEG Baseline lossy process 1 (8 bit)
-    imageFrame = decodeJPEGBaseline(imageFrame, pixelData);
-  } else if (transferSyntax === '1.2.840.10008.1.2.4.51') {
+    imageFrame = decodeJPEGBaseline.decode(imageFrame, pixelData);
+  } else if (
+    transferSyntax === '1.2.840.10008.1.2.4.51' &&
+    decodeJPEGBaseline
+  ) {
     // JPEG Baseline lossy process 2 & 4 (12 bit)
-    imageFrame = decodeJPEGBaseline(imageFrame, pixelData);
-  } else if (transferSyntax === '1.2.840.10008.1.2.4.57') {
+    imageFrame = decodeJPEGBaseline.decode(imageFrame, pixelData);
+  } else if (
+    transferSyntax === '1.2.840.10008.1.2.4.57' &&
+    decodeJPEGLossless
+  ) {
     // JPEG Lossless, Nonhierarchical (Processes 14)
-    imageFrame = decodeJPEGLossless(imageFrame, pixelData);
-  } else if (transferSyntax === '1.2.840.10008.1.2.4.70') {
+    imageFrame = decodeJPEGLossless.decode(imageFrame, pixelData);
+  } else if (
+    transferSyntax === '1.2.840.10008.1.2.4.70' &&
+    decodeJPEGLossless
+  ) {
     // JPEG Lossless, Nonhierarchical (Processes 14 [Selection 1])
-    imageFrame = decodeJPEGLossless(imageFrame, pixelData);
-  } else if (transferSyntax === '1.2.840.10008.1.2.4.80') {
+    imageFrame = decodeJPEGLossless.decode(imageFrame, pixelData);
+  } else if (transferSyntax === '1.2.840.10008.1.2.4.80' && decodeJPEGLS) {
     // JPEG-LS Lossless Image Compression
-    imageFrame = decodeJPEGLS(imageFrame, pixelData);
-  } else if (transferSyntax === '1.2.840.10008.1.2.4.81') {
+    imageFrame = decodeJPEGLS.decode(imageFrame, pixelData);
+  } else if (transferSyntax === '1.2.840.10008.1.2.4.81' && decodeJPEGLS) {
     // JPEG-LS Lossy (Near-Lossless) Image Compression
-    imageFrame = decodeJPEGLS(imageFrame, pixelData);
-  } else if (transferSyntax === '1.2.840.10008.1.2.4.90') {
+    imageFrame = decodeJPEGLS.decode(imageFrame, pixelData);
+  } else if (transferSyntax === '1.2.840.10008.1.2.4.90' && decodeJPEG2000) {
     // JPEG 2000 Lossless
-    imageFrame = decodeJPEG2000(imageFrame, pixelData, decodeConfig, options);
-  } else if (transferSyntax === '1.2.840.10008.1.2.4.91') {
+    imageFrame = decodeJPEG2000.decode(
+      imageFrame,
+      pixelData,
+      decodeConfig,
+      options
+    );
+  } else if (transferSyntax === '1.2.840.10008.1.2.4.91' && decodeJPEG2000) {
     // JPEG 2000 Lossy
-    imageFrame = decodeJPEG2000(imageFrame, pixelData, decodeConfig, options);
+    imageFrame = decodeJPEG2000.decode(
+      imageFrame,
+      pixelData,
+      decodeConfig,
+      options
+    );
+  } else if (transferSyntax === 'HTJ2K' && decodeHTJ2K) {
+    // High Throughput JPEG 2000
+    imageFrame = await decodeHTJ2K.decode(imageFrame, pixelData);
   } else {
     throw new Error(`no decoder for transfer syntax ${transferSyntax}`);
   }
@@ -83,7 +120,7 @@ function decodeImageFrame(
 
   if (shouldShift && shift !== undefined) {
     for (let i = 0; i < imageFrame.pixelData.length; i++) {
-      // eslint-disable-next-line no-bitwise
+      // eslint-disable-next-line no-bitwise, require-atomic-updates
       imageFrame.pixelData[i] = (imageFrame.pixelData[i] << shift) >> shift;
     }
   }
@@ -137,6 +174,7 @@ function decodeImageFrame(
 
   const end = new Date().getTime();
 
+  // eslint-disable-next-line require-atomic-updates
   imageFrame.decodeTimeInMS = end - start;
 
   return imageFrame;

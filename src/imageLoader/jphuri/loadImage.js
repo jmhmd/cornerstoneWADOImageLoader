@@ -33,7 +33,7 @@ function loadImageFromPromise(
       (dataSet /* , xhr*/) => {
         const pixelData = getPixelData(dataSet, frame);
         // const transferSyntax = dataSet.string('x00020010');
-        const transferSyntax = 'htj2k';
+        const transferSyntax = 'HTJ2K';
         const loadEnd = new Date().getTime();
         const imagePromise = createImage(
           imageId,

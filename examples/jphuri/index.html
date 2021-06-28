@@ -4,7 +4,6 @@
     <!-- twitter bootstrap CSS stylesheet - included to make things pretty, not needed or used by cornerstone -->
     <link href="../bootstrap.min.css" rel="stylesheet">
     <link href="../cornerstone.min.css" rel="stylesheet">
-    <script type="text/javascript" src="/dist/openjphjs.js"></script>
 </head>
 <body>
 <div class="container">
@@ -158,6 +157,9 @@
 <!-- include the cornerstoneWADOImageLoader library -->
 <script src="../../dist/cornerstoneWADOImageLoader.js"></script>
 
+<!-- include desired codecs -->
+<script src="../../dist/decodeHtj2k.js"></script>
+
 <script src="../dicomfile/uids.js"></script>
 
 <!-- Lines ONLY required for this example to run without building the project -->
@@ -168,6 +170,7 @@
     cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
 
     cornerstoneWADOImageLoader.configure({
+        useWebWorkers: false,
         beforeSend: function(xhr) {
             // Add custom headers here (e.g. auth tokens)
             //xhr.setRequestHeader('APIKEY', 'my auth token');
@@ -252,10 +255,12 @@
                 document.getElementById('decodeTime').textContent = image.decodeTimeInMS + "ms";
 
             }, function(err) {
+                console.error(err);
                 alert(err);
             });
         }
         catch(err) {
+            console.error(err);
             alert(err);
         }
     }

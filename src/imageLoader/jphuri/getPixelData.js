@@ -1,5 +1,5 @@
 function getPixelData(dataSet /*  frameIndex = 0 */) {
-  return dataSet.rawImageFrame;
+  return dataSet.jphImageFrame;
 }
 
 export default getPixelData;

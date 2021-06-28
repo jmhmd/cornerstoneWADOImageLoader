@@ -1,6 +1,6 @@
 import external from '../../externalModules.js';
 import { xhrRequest, xhrRequestMetadata } from '../internal/index.js';
-import jph2raw from './jph2raw.js';
+// import jph2raw from './jph2raw.js';
 
 /**
  * This object supports loading of DICOM P10 dataset from a uri and caching it so it can be accessed
@@ -65,17 +65,17 @@ function load(uri, loadRequest = xhrRequest, imageId) {
       }
 
       loadRequest(uri, imageId)
-        .then(function(jphImageFrameAsArrayBuffer) {
-          return jph2raw(Buffer.from(jphImageFrameAsArrayBuffer));
-        })
-        .then(function(rawImageFrame) {
-          dataSet.rawImageFrame = rawImageFrame;
+        // .then(function(jphImageFrameAsArrayBuffer) {
+        //   return jph2raw(Buffer.from(jphImageFrameAsArrayBuffer));
+        // })
+        .then(function(jphImageFrame) {
+          dataSet.jphImageFrame = Buffer.from(jphImageFrame);
           loadedDataSets[uri] = {
             dataSet,
             cacheCount: promise.cacheCount,
           };
           cacheSizeInBytes +=
-            dataSet.byteArray.length + dataSet.rawImageFrame.byteLength;
+            dataSet.byteArray.length + dataSet.jphImageFrame.byteLength;
           resolve(dataSet);
 
           cornerstone.triggerEvent(cornerstone.events, 'datasetscachechanged', {

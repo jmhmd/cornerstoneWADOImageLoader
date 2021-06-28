@@ -12,6 +12,12 @@ module.exports = {
   entry: {
     cornerstoneWADOImageLoader: './imageLoader/index.js',
     cornerstoneWADOImageLoaderWebWorker: './webWorker/index.worker.js',
+    decodeJpegBaseline: './shared/decoders/decodeJPEGBaseline.js',
+    decodeJpeg2000: './shared/decoders/decodeJPEG2000.js',
+    decodeJpegLS: './shared/decoders/decodeJPEGLS.js',
+    decodeJpegLossless: './shared/decoders/decodeJPEGLossless.js',
+    decodeHtj2k: './shared/decoders/decodeHTJ2K.js',
+    allDecoders: './shared/decoders/allExternalDecoders.js',
   },
   target: 'web',
   output: {
@@ -22,7 +28,7 @@ module.exports = {
     path: outputPath,
     umdNamedDefine: true,
   },
-  devtool: 'source-map',
+  devtool: 'eval',
   externals: {
     'dicom-parser': {
       commonjs: 'dicom-parser',
@@ -47,7 +53,7 @@ module.exports = {
         test: /\.worker\.js$/,
         use: {
           loader: 'worker-loader',
-          options: { inline: true, fallback: false },
+          options: { inline: 'no-fallback' },
         },
       },
       /*{
@@ -90,11 +96,15 @@ module.exports = {
       patterns: [
         {
           from: 'codecs/openjphjs.wasm',
-          to: 'dist/openjphjs.wasm',
+          to: 'openjphjs.wasm',
           context: rootPath,
         },
       ],
     }),
   ],
-  node: { fs: 'empty' },
+  resolve: {
+    fallback: {
+      fs: false,
+    },
+  },
 };

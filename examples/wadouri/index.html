@@ -157,6 +157,11 @@
 <!-- include the cornerstoneWADOImageLoader library -->
 <script src="../../dist/cornerstoneWADOImageLoader.js"></script>
 
+<!-- include desired codecs -->
+<script src="../../dist/decodeJpeg2000.js"></script>
+<script src="../../dist/decodeJpegLS.js"></script>
+<script src="../../dist/decodeJpegLossless.js"></script>
+
 <script src="../dicomfile/uids.js"></script>
 
 <!-- Lines ONLY required for this example to run without building the project -->
@@ -167,9 +172,13 @@
     cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
 
     cornerstoneWADOImageLoader.configure({
+        useWebWorkers: false,
         beforeSend: function(xhr) {
             // Add custom headers here (e.g. auth tokens)
             //xhr.setRequestHeader('APIKEY', 'my auth token');
+        },
+        decodeConfig: {
+            decoders: ["jpeg2000"]
         }
     });
 

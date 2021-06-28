@@ -5,12 +5,31 @@ import decodeJPEGBaseline8BitColor from './decodeJPEGBaseline8BitColor.js';
 // TODO: Find a way to allow useWebWorkers: false that doesn't make the main bundle huge
 import { default as decodeImageFrameHandler } from '../shared/decodeImageFrame.js';
 import calculateMinMax from '../shared/calculateMinMax.js';
-import { initializeJPEG2000 } from '../shared/decoders/decodeJPEG2000.js';
-import { initializeJPEGLS } from '../shared/decoders/decodeJPEGLS.js';
+import external from '../externalModules.js';
+// import { initializeJPEG2000 } from '../shared/decoders/decodeJPEG2000.js';
+// import { initializeJPEGLS } from '../shared/decoders/decodeJPEGLS.js';
+
+const { decodeJPEG2000, decodeJPEGLS } = external.decoders;
 
 let codecsInitialized = false;
 
-function processDecodeTask(imageFrame, transferSyntax, pixelData, options) {
+function initializeCodecs(decodeConfig) {
+  if (decodeJPEG2000) {
+    decodeJPEG2000.initialize(decodeConfig);
+  }
+  if (decodeJPEGLS) {
+    decodeJPEGLS.initialize(decodeConfig);
+  }
+
+  codecsInitialized = true;
+}
+
+async function processDecodeTask(
+  imageFrame,
+  transferSyntax,
+  pixelData,
+  options
+) {
   const priority = options.priority || undefined;
   const transferList = options.transferPixelData
     ? [pixelData.buffer]
@@ -20,30 +39,23 @@ function processDecodeTask(imageFrame, transferSyntax, pixelData, options) {
 
   if (useWebWorkers === false) {
     if (codecsInitialized === false) {
-      initializeJPEG2000(decodeConfig);
-      initializeJPEGLS(decodeConfig);
-
-      codecsInitialized = true;
+      await initializeCodecs(decodeConfig);
     }
 
-    return new Promise((resolve, reject) => {
-      try {
-        const decodeArguments = [
-          imageFrame,
-          transferSyntax,
-          pixelData,
-          decodeConfig,
-          options,
-        ];
-        const decodedImageFrame = decodeImageFrameHandler(...decodeArguments);
+    // return new Promise(async (resolve, reject) => {
+    const decodeArguments = [
+      imageFrame,
+      transferSyntax,
+      pixelData,
+      decodeConfig,
+      options,
+    ];
+    const decodedImageFrame = await decodeImageFrameHandler(...decodeArguments);
 
-        calculateMinMax(decodedImageFrame, strict);
+    calculateMinMax(decodedImageFrame, strict);
 
-        resolve(decodedImageFrame);
-      } catch (error) {
-        reject(error);
-      }
-    });
+    return decodedImageFrame;
+    // });
   }
 
   return webWorkerManager.addTask(
@@ -115,6 +127,8 @@ function decodeImageFrame(
     return processDecodeTask(imageFrame, transferSyntax, pixelData, options);
   } else if (transferSyntax === '1.2.840.10008.1.2.4.91') {
     // JPEG 2000 Lossy
+    return processDecodeTask(imageFrame, transferSyntax, pixelData, options);
+  } else if (transferSyntax === 'HTJ2K') {
     return processDecodeTask(imageFrame, transferSyntax, pixelData, options);
   }
 
