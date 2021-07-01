@@ -9,13 +9,34 @@ let options = {
   imageCreated(/* image */) {},
   strict: false,
   useWebWorkers: true,
+  webWorkerConfig: {
+    maxWebWorkers: navigator.hardwareConcurrency || 1,
+    startWebWorkersOnDemand: true,
+    webWorkerTaskPaths: [],
+    taskConfiguration: {
+      decodeTask: {
+        initializeCodecsOnStartup: false,
+      },
+    },
+  },
   decodeConfig: {
     usePDFJS: false,
+    decoderPaths: [],
+    autoLoadCodecs: true,
   },
 };
 
 export function setOptions(newOptions) {
   options = Object.assign(options, newOptions);
+
+  // Copy decode related options to decodeTask config
+  options.webWorkerConfig.taskConfiguration.decodeTask = Object.assign(
+    options.webWorkerConfig.taskConfiguration.decodeTask,
+    options.decodeConfig,
+    { strict: options.strict }
+  );
+
+  return options;
 }
 
 export function getOptions() {
